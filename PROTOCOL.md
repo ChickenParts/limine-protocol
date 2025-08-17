@@ -787,6 +787,16 @@ Values assignable to `mode`, `max_mode`, and `min_mode`:
 #define LIMINE_PAGING_MODE_MIN LIMINE_PAGING_MODE_ZARCH_4LVL
 ```
 
+#### Itanium
+
+Values assignable to `mode`, `max_mode`, and `min_mode`:
+```c
+#define LIMINE_PAGING_MODE_IA64_4LVL 0
+
+#define LIMINE_PAGING_MODE_DEFAULT LIMINE_PAGING_MODE_IA64_4LVL
+#define LIMINE_PAGING_MODE_MIN LIMINE_PAGING_MODE_IA64_4LVL
+```
+
 ### MP (multiprocessor) Feature
 
 ID:
@@ -1127,6 +1137,51 @@ struct limine_mp_info {
 * `goto_address` - An atomic write to this field causes the parked CPU to
 jump to the written address, on a 64KiB (or Stack Size Request size) stack. A pointer to the
 `struct limine_mp_info` structure of the CPU is passed in `r2`. Other than
+that, the CPU state will be the same as described for the bootstrap
+processor. This field is unused for the structure describing the bootstrap
+processor.
+* `extra_argument` - A free for use field.
+
+#### Itanium
+
+Response:
+
+```c
+struct limine_mp_response {
+    uint64_t revision;
+    uint64_t flags;
+    uint64_t bsp_lid;
+    uint64_t cpu_count;
+    struct limine_mp_info **cpus;
+};
+```
+
+* `flags` - Always zero
+* `bsp_lid` - LID of the bootstrap processor.
+* `cpu_count` - How many CPUs are present. It includes the bootstrap processor.
+* `cpus` - Pointer to an array of `cpu_count` pointers to
+`struct limine_mp_info` structures.
+
+Note: The presence of this request will prompt the bootloader to bootstrap
+the secondary processors. This will not be done if this request is not present.
+
+```c
+struct limine_mp_info;
+
+typedef void (*limine_goto_address)(struct limine_mp_info *);
+
+struct limine_mp_info {
+    uint64_t lid;
+    uint64_t reserved;
+    limine_goto_address goto_address;
+    uint64_t extra_argument;
+};
+```
+
+* `lid` - The LID of the CPU.
+* `goto_address` - An atomic write to this field causes the parked CPU to
+jump to the written address, on a 64KiB (or Stack Size Request size) stack. A pointer to the
+`struct limine_mp_info` structure of the CPU is passed in `r8`. Other than
 that, the CPU state will be the same as described for the bootstrap
 processor. This field is unused for the structure describing the bootstrap
 processor.
@@ -1780,3 +1835,29 @@ struct limine_zarch_cpu_features_response {
 ```
 
 * `facilities` - The facility bits of the CPU.
+
+### Itanium CPU Features Feature
+
+ID:
+```c
+#define LIMINE_IA64_CPU_FEATURES_REQUEST { LIMINE_COMMON_MAGIC, 0xc7d6e5f43210a9b8, 0x34567890abcdef12 }
+```
+
+Request:
+```c
+struct limine_ia64_cpu_features_request {
+    uint64_t id[4];
+    uint64_t revision;
+    struct limine_ia64_cpu_features_response *response;
+};
+```
+
+Response:
+```c
+struct limine_ia64_cpu_features_response {
+    uint64_t revision;
+    uint64_t features[8];
+};
+```
+
+* `features` - The feature bits of the CPU.
