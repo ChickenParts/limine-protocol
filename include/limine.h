@@ -324,6 +324,10 @@ LIMINE_DEPRECATED_IGNORE_END
 #define LIMINE_PAGING_MODE_MIPS64_4LVL 0
 #define LIMINE_PAGING_MODE_MIN LIMINE_PAGING_MODE_MIPS64_4LVL
 #define LIMINE_PAGING_MODE_DEFAULT LIMINE_PAGING_MODE_MIPS64_4LVL
+#elif defined (__powerpc64__)
+#define LIMINE_PAGING_MODE_PPC64_4LVL 0
+#define LIMINE_PAGING_MODE_MIN LIMINE_PAGING_MODE_PPC64_4LVL
+#define LIMINE_PAGING_MODE_DEFAULT LIMINE_PAGING_MODE_PPC64_4LVL
 #else
 #error Unknown architecture
 #endif
@@ -459,6 +463,23 @@ struct LIMINE_MP(response) {
     uint64_t revision;
     uint64_t flags;
     uint32_t bsp_processor_id;
+    uint64_t cpu_count;
+    LIMINE_PTR(struct LIMINE_MP(info) **) cpus;
+};
+
+#elif defined (__powerpc64__)
+
+struct LIMINE_MP(info) {
+    uint64_t sprg0;
+    uint64_t reserved;
+    LIMINE_PTR(limine_goto_address) goto_address;
+    uint64_t extra_argument;
+};
+
+struct LIMINE_MP(response) {
+    uint64_t revision;
+    uint64_t flags;
+    uint64_t bsp_sprg0;
     uint64_t cpu_count;
     LIMINE_PTR(struct LIMINE_MP(info) **) cpus;
 };
