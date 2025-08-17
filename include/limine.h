@@ -927,6 +927,21 @@ struct limine_ppc64_cpu_features_request {
     LIMINE_PTR(struct limine_ppc64_cpu_features_response *) response;
 };
 
+/* SPARC V9 CPU Features */
+
+#define LIMINE_SPARCV9_CPU_FEATURES_REQUEST { LIMINE_COMMON_MAGIC, 0xa9b8c7d6e5f43210, 0x1234567890abcdef }
+
+struct limine_sparcv9_cpu_features_response {
+    uint64_t revision;
+    uint64_t ver;
+};
+
+struct limine_sparcv9_cpu_features_request {
+    uint64_t id[4];
+    uint64_t revision;
+    LIMINE_PTR(struct limine_sparcv9_cpu_features_response *) response;
+};
+
 /* Bootloader Performance */
 
 #define LIMINE_BOOTLOADER_PERFORMANCE_REQUEST { LIMINE_COMMON_MAGIC, 0x6b50ad9bf36d13ad, 0xdc4c7e88fc759e17 }

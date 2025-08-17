@@ -767,6 +767,16 @@ Values assignable to `mode`, `max_mode`, and `min_mode`:
 #define LIMINE_PAGING_MODE_MIN LIMINE_PAGING_MODE_PPC64_4LVL
 ```
 
+#### sparcv9
+
+Values assignable to `mode`, `max_mode`, and `min_mode`:
+```c
+#define LIMINE_PAGING_MODE_SPARC_V9_4LVL 0
+
+#define LIMINE_PAGING_MODE_DEFAULT LIMINE_PAGING_MODE_SPARC_V9_4LVL
+#define LIMINE_PAGING_MODE_MIN LIMINE_PAGING_MODE_SPARC_V9_4LVL
+```
+
 ### MP (multiprocessor) Feature
 
 ID:
@@ -1017,6 +1027,51 @@ struct limine_mp_info {
 * `goto_address` - An atomic write to this field causes the parked CPU to
 jump to the written address, on a 64KiB (or Stack Size Request size) stack. A pointer to the
 `struct limine_mp_info` structure of the CPU is passed in `r3`. Other than
+that, the CPU state will be the same as described for the bootstrap
+processor. This field is unused for the structure describing the bootstrap
+processor.
+* `extra_argument` - A free for use field.
+
+#### sparcv9
+
+Response:
+
+```c
+struct limine_mp_response {
+    uint64_t revision;
+    uint64_t flags;
+    uint64_t bsp_tpc;
+    uint64_t cpu_count;
+    struct limine_mp_info **cpus;
+};
+```
+
+* `flags` - Always zero
+* `bsp_tpc` - TPC of the bootstrap processor.
+* `cpu_count` - How many CPUs are present. It includes the bootstrap processor.
+* `cpus` - Pointer to an array of `cpu_count` pointers to
+`struct limine_mp_info` structures.
+
+Note: The presence of this request will prompt the bootloader to bootstrap
+the secondary processors. This will not be done if this request is not present.
+
+```c
+struct limine_mp_info;
+
+typedef void (*limine_goto_address)(struct limine_mp_info *);
+
+struct limine_mp_info {
+    uint64_t tpc;
+    uint64_t reserved;
+    limine_goto_address goto_address;
+    uint64_t extra_argument;
+};
+```
+
+* `tpc` - The TPC of the CPU.
+* `goto_address` - An atomic write to this field causes the parked CPU to
+jump to the written address, on a 64KiB (or Stack Size Request size) stack. A pointer to the
+`struct limine_mp_info` structure of the CPU is passed in `o0`. Other than
 that, the CPU state will be the same as described for the bootstrap
 processor. This field is unused for the structure describing the bootstrap
 processor.
@@ -1618,3 +1673,29 @@ struct limine_ppc64_cpu_features_response {
 ```
 
 * `pvr` - The PVR (Processor Version Register) of the CPU.
+
+### SPARC V9 CPU Features Feature
+
+ID:
+```c
+#define LIMINE_SPARCV9_CPU_FEATURES_REQUEST { LIMINE_COMMON_MAGIC, 0xa9b8c7d6e5f43210, 0x1234567890abcdef }
+```
+
+Request:
+```c
+struct limine_sparcv9_cpu_features_request {
+    uint64_t id[4];
+    uint64_t revision;
+    struct limine_sparcv9_cpu_features_response *response;
+};
+```
+
+Response:
+```c
+struct limine_sparcv9_cpu_features_response {
+    uint64_t revision;
+    uint64_t ver;
+};
+```
+
+* `ver` - The VER (Version) register of the CPU.
