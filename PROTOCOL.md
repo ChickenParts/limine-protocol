@@ -274,6 +274,69 @@ All HHDM and identity map memory regions are mapped using the Coherent Cached (C
 MAT, except for the framebuffer regions, which are mapped in using the
 Weakly-ordered UnCached (WUC) MAT.
 
+### mips64
+
+The executable, loaded at or above `0xffffffff80000000`, sees all of its
+segments mapped using the cacheable coherent memory access type.
+
+All HHDM and identity map memory regions are mapped using the cacheable coherent
+memory access type, except for the framebuffer regions, which are mapped in using
+the uncached memory access type.
+
+### powerpc64
+
+The executable, loaded at or above `0xffffffff80000000`, sees all of its
+segments mapped using the cacheable memory access type.
+
+All HHDM and identity map memory regions are mapped using the cacheable
+memory access type, except for the framebuffer regions, which are mapped in using
+the cache-inhibited memory access type.
+
+### sparcv9
+
+The executable, loaded at or above `0xffffffff80000000`, sees all of its
+segments mapped using the cacheable memory access type.
+
+All HHDM and identity map memory regions are mapped using the cacheable
+memory access type, except for the framebuffer regions, which are mapped in using
+the non-cacheable memory access type.
+
+### z/Architecture
+
+The executable, loaded at or above `0xffffffff80000000`, sees all of its
+segments mapped using the cacheable memory access type.
+
+All HHDM and identity map memory regions are mapped using the cacheable
+memory access type, except for the framebuffer regions, which are mapped in using
+the non-cacheable memory access type.
+
+### Itanium
+
+The executable, loaded at or above `0xffffffff80000000`, sees all of its
+segments mapped using the cacheable memory access type.
+
+All HHDM and identity map memory regions are mapped using the cacheable
+memory access type, except for the framebuffer regions, which are mapped in using
+the non-cacheable memory access type.
+
+### Alpha
+
+The executable, loaded at or above `0xffffffff80000000`, sees all of its
+segments mapped using the cacheable memory access type.
+
+All HHDM and identity map memory regions are mapped using the cacheable
+memory access type, except for the framebuffer regions, which are mapped in using
+the non-cacheable memory access type.
+
+### PA-RISC 2.0
+
+The executable, loaded at or above `0xffffffff80000000`, sees all of its
+segments mapped using the cacheable memory access type.
+
+All HHDM and identity map memory regions are mapped using the cacheable
+memory access type, except for the framebuffer regions, which are mapped in using
+the non-cacheable memory access type.
+
 ## Machine state at entry
 
 ### x86-64
@@ -418,6 +481,151 @@ If booted by EFI/UEFI, boot services are exited.
 `PG` in `CSR.CRMD` is 1, `DA` is 0, `IE` is 0 and `PLV` is 0 but is otherwise unspecified.
 
 `CSR.TLBRENTRY` is filled with a provided TLB refill handler.
+
+### mips64
+
+At entry the machine is executing in kernel mode.
+
+`PC` will be the entry point as defined as part of the executable file format,
+unless the Entry Point feature is requested (see below), in which case, the
+value of `PC` is going to be taken from there.
+
+`ra` is set to 0, the executable must not return from the entry point.
+
+`sp` is set to point to a stack, in bootloader-reclaimable memory, which is
+at least 64KiB (65536 bytes) in size, or the size specified in the Stack
+Size Request (see below).
+
+All other general purpose registers are set to 0.
+
+The `Status` register has the `ERL` and `EXL` bits cleared. The `BEV` bit is
+set. The `IE` bit is cleared. Other bits are in an undefined state.
+
+Paging is enabled.
+
+### powerpc64
+
+At entry the machine is executing in supervisor mode.
+
+`NIP` will be the entry point as defined as part of the executable file format,
+unless the Entry Point feature is requested (see below), in which case, the
+value of `NIP` is going to be taken from there.
+
+`LR` is set to 0, the executable must not return from the entry point.
+
+`r1` is set to point to a stack, in bootloader-reclaimable memory, which is
+at least 64KiB (65536 bytes) in size, or the size specified in the Stack
+Size Request (see below).
+
+All other general purpose registers are set to 0.
+
+The `MSR` has the `IR` and `DR` bits set. The `EE` bit is cleared. Other bits
+are in an undefined state.
+
+Paging is enabled.
+
+### sparcv9
+
+At entry the machine is executing in supervisor mode.
+
+`PC` will be the entry point as defined as part of the executable file format,
+unless the Entry Point feature is requested (see below), in which case, the
+value of `PC` is going to be taken from there.
+
+`o7` is set to 0, the executable must not return from the entry point.
+
+`sp` is set to point to a stack, in bootloader-reclaimable memory, which is
+at least 64KiB (65536 bytes) in size, or the size specified in the Stack
+Size Request (see below).
+
+All other general purpose registers are set to 0.
+
+The `PSTATE` register has the `IE` bit cleared. Other bits are in an undefined
+state.
+
+Paging is enabled.
+
+### z/Architecture
+
+At entry the machine is executing in supervisor mode.
+
+The instruction address in the `PSW` will be the entry point as defined as part
+of the executable file format, unless the Entry Point feature is requested (see
+below), in which case, the value of the instruction address in the `PSW` is
+going to be taken from there.
+
+`r14` is set to 0, the executable must not return from the entry point.
+
+`r15` is set to point to a stack, in bootloader-reclaimable memory, which is
+at least 64KiB (65536 bytes) in size, or the size specified in the Stack
+Size Request (see below).
+
+All other general purpose registers are set to 0.
+
+The `PSW` has the `wait` and `problem` bits set to 0. The `io` and `ext` bits
+are set to 1. Other bits are in an undefined state.
+
+Paging is enabled.
+
+### Itanium
+
+At entry the machine is executing in supervisor mode.
+
+`IP` will be the entry point as defined as part of the executable file format,
+unless the Entry Point feature is requested (see below), in which case, the
+value of `IP` is going to be taken from there.
+
+`b0` is set to 0, the executable must not return from the entry point.
+
+`sp` is set to point to a stack, in bootloader-reclaimable memory, which is
+at least 64KiB (65536 bytes) in size, or the size specified in the Stack
+Size Request (see below).
+
+All other general purpose registers are set to 0.
+
+The `PSR` has the `i` bit cleared. Other bits are in an undefined state.
+
+Paging is enabled.
+
+### Alpha
+
+At entry the machine is executing in supervisor mode.
+
+`PC` will be the entry point as defined as part of the executable file format,
+unless the Entry Point feature is requested (see below), in which case, the
+value of `PC` is going to be taken from there.
+
+`ra` is set to 0, the executable must not return from the entry point.
+
+`sp` is set to point to a stack, in bootloader-reclaimable memory, which is
+at least 64KiB (65536 bytes) in size, or the size specified in the Stack
+Size Request (see below).
+
+All other general purpose registers are set to 0.
+
+The `PS` has the `IE` bit cleared. Other bits are in an undefined state.
+
+Paging is enabled.
+
+### PA-RISC 2.0
+
+At entry the machine is executing in supervisor mode.
+
+`IAOQ_FRONT` will be the entry point as defined as part of the executable file
+format, unless the Entry Point feature is requested (see below), in which case,
+the value of `IAOQ_FRONT` is going to be taken from there.
+
+`rp` is set to 0, the executable must not return from the entry point.
+
+`sp` is set to point to a stack, in bootloader-reclaimable memory, which is
+at least 64KiB (65536 bytes) in size, or the size specified in the Stack
+Size Request (see below).
+
+All other general purpose registers are set to 0.
+
+The `PSW` has the `I` bit cleared. Other bits are in an undefined state.
+
+Paging is enabled.
 
 ## Feature List
 
