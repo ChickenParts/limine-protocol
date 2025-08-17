@@ -972,6 +972,22 @@ struct limine_ia64_cpu_features_request {
     LIMINE_PTR(struct limine_ia64_cpu_features_response *) response;
 };
 
+/* Alpha CPU Features */
+
+#define LIMINE_ALPHA_CPU_FEATURES_REQUEST { LIMINE_COMMON_MAGIC, 0xd6e5f43210a9b8c7, 0x4567890abcdef123 }
+
+struct limine_alpha_cpu_features_response {
+    uint64_t revision;
+    uint64_t implver;
+    uint64_t amask;
+};
+
+struct limine_alpha_cpu_features_request {
+    uint64_t id[4];
+    uint64_t revision;
+    LIMINE_PTR(struct limine_alpha_cpu_features_response *) response;
+};
+
 /* Bootloader Performance */
 
 #define LIMINE_BOOTLOADER_PERFORMANCE_REQUEST { LIMINE_COMMON_MAGIC, 0x6b50ad9bf36d13ad, 0xdc4c7e88fc759e17 }

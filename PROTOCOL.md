@@ -797,6 +797,16 @@ Values assignable to `mode`, `max_mode`, and `min_mode`:
 #define LIMINE_PAGING_MODE_MIN LIMINE_PAGING_MODE_IA64_4LVL
 ```
 
+#### Alpha
+
+Values assignable to `mode`, `max_mode`, and `min_mode`:
+```c
+#define LIMINE_PAGING_MODE_ALPHA_3LVL 0
+
+#define LIMINE_PAGING_MODE_DEFAULT LIMINE_PAGING_MODE_ALPHA_3LVL
+#define LIMINE_PAGING_MODE_MIN LIMINE_PAGING_MODE_ALPHA_3LVL
+```
+
 ### MP (multiprocessor) Feature
 
 ID:
@@ -1182,6 +1192,51 @@ struct limine_mp_info {
 * `goto_address` - An atomic write to this field causes the parked CPU to
 jump to the written address, on a 64KiB (or Stack Size Request size) stack. A pointer to the
 `struct limine_mp_info` structure of the CPU is passed in `r8`. Other than
+that, the CPU state will be the same as described for the bootstrap
+processor. This field is unused for the structure describing the bootstrap
+processor.
+* `extra_argument` - A free for use field.
+
+#### Alpha
+
+Response:
+
+```c
+struct limine_mp_response {
+    uint64_t revision;
+    uint64_t flags;
+    uint32_t bsp_id;
+    uint64_t cpu_count;
+    struct limine_mp_info **cpus;
+};
+```
+
+* `flags` - Always zero
+* `bsp_id` - Processor ID of the bootstrap processor.
+* `cpu_count` - How many CPUs are present. It includes the bootstrap processor.
+* `cpus` - Pointer to an array of `cpu_count` pointers to
+`struct limine_mp_info` structures.
+
+Note: The presence of this request will prompt the bootloader to bootstrap
+the secondary processors. This will not be done if this request is not present.
+
+```c
+struct limine_mp_info;
+
+typedef void (*limine_goto_address)(struct limine_mp_info *);
+
+struct limine_mp_info {
+    uint32_t processor_id;
+    uint32_t reserved;
+    limine_goto_address goto_address;
+    uint64_t extra_argument;
+};
+```
+
+* `processor_id` - The processor ID of the CPU.
+* `goto_address` - An atomic write to this field causes the parked CPU to
+jump to the written address, on a 64KiB (or Stack Size Request size) stack. A pointer to the
+`struct limine_mp_info` structure of the CPU is passed in `a0`. Other than
 that, the CPU state will be the same as described for the bootstrap
 processor. This field is unused for the structure describing the bootstrap
 processor.
@@ -1861,3 +1916,31 @@ struct limine_ia64_cpu_features_response {
 ```
 
 * `features` - The feature bits of the CPU.
+
+### Alpha CPU Features Feature
+
+ID:
+```c
+#define LIMINE_ALPHA_CPU_FEATURES_REQUEST { LIMINE_COMMON_MAGIC, 0xd6e5f43210a9b8c7, 0x4567890abcdef123 }
+```
+
+Request:
+```c
+struct limine_alpha_cpu_features_request {
+    uint64_t id[4];
+    uint64_t revision;
+    struct limine_alpha_cpu_features_response *response;
+};
+```
+
+Response:
+```c
+struct limine_alpha_cpu_features_response {
+    uint64_t revision;
+    uint64_t implver;
+    uint64_t amask;
+};
+```
+
+* `implver` - The IMPLVER of the CPU.
+* `amask` - The AMASK of the CPU.
