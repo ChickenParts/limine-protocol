@@ -894,6 +894,23 @@ struct limine_riscv_bsp_hartid_request {
     LIMINE_PTR(struct limine_riscv_bsp_hartid_response *) response;
 };
 
+/* MIPS64 CPU Features */
+
+#define LIMINE_MIPS64_CPU_FEATURES_REQUEST { LIMINE_COMMON_MAGIC, 0x8c941a9b6b2f8a1e, 0x9e8b8c3c1b2a2e8b }
+
+struct limine_mips64_cpu_features_response {
+    uint64_t revision;
+    uint64_t processor_id;
+    uint64_t mmu_size;
+    uint64_t tlb_entries;
+};
+
+struct limine_mips64_cpu_features_request {
+    uint64_t id[4];
+    uint64_t revision;
+    LIMINE_PTR(struct limine_mips64_cpu_features_response *) response;
+};
+
 /* Bootloader Performance */
 
 #define LIMINE_BOOTLOADER_PERFORMANCE_REQUEST { LIMINE_COMMON_MAGIC, 0x6b50ad9bf36d13ad, 0xdc4c7e88fc759e17 }

@@ -747,6 +747,16 @@ Values assignable to `mode`, `max_mode`, and `min_mode`:
 #define LIMINE_PAGING_MODE_MIN LIMINE_PAGING_MODE_LOONGARCH64_4LVL
 ```
 
+#### mips64
+
+Values assignable to `mode`, `max_mode`, and `min_mode`:
+```c
+#define LIMINE_PAGING_MODE_MIPS64_4LVL 0
+
+#define LIMINE_PAGING_MODE_DEFAULT LIMINE_PAGING_MODE_MIPS64_4LVL
+#define LIMINE_PAGING_MODE_MIN LIMINE_PAGING_MODE_MIPS64_4LVL
+```
+
 ### MP (multiprocessor) Feature
 
 ID:
@@ -907,6 +917,51 @@ struct limine_mp_info {
 * `goto_address` - An atomic write to this field causes the parked CPU to
 jump to the written address, on a 64KiB (or Stack Size Request size) stack. A pointer to the
 `struct limine_mp_info` structure of the CPU is passed in `x10`(`a0`). Other than
+that, the CPU state will be the same as described for the bootstrap
+processor. This field is unused for the structure describing the bootstrap
+processor.
+* `extra_argument` - A free for use field.
+
+#### mips64
+
+Response:
+
+```c
+struct limine_mp_response {
+    uint64_t revision;
+    uint64_t flags;
+    uint32_t bsp_processor_id;
+    uint64_t cpu_count;
+    struct limine_mp_info **cpus;
+};
+```
+
+* `flags` - Always zero
+* `bsp_processor_id` - Processor ID of the bootstrap processor.
+* `cpu_count` - How many CPUs are present. It includes the bootstrap processor.
+* `cpus` - Pointer to an array of `cpu_count` pointers to
+`struct limine_mp_info` structures.
+
+Note: The presence of this request will prompt the bootloader to bootstrap
+the secondary processors. This will not be done if this request is not present.
+
+```c
+struct limine_mp_info;
+
+typedef void (*limine_goto_address)(struct limine_mp_info *);
+
+struct limine_mp_info {
+    uint32_t processor_id;
+    uint32_t reserved;
+    limine_goto_address goto_address;
+    uint64_t extra_argument;
+};
+```
+
+* `processor_id` - The processor ID of the CPU.
+* `goto_address` - An atomic write to this field causes the parked CPU to
+jump to the written address, on a 64KiB (or Stack Size Request size) stack. A pointer to the
+`struct limine_mp_info` structure of the CPU is passed in `a0`. Other than
 that, the CPU state will be the same as described for the bootstrap
 processor. This field is unused for the structure describing the bootstrap
 processor.
@@ -1451,3 +1506,33 @@ this feature using the FPDT.
 Note: The bootloader may assume `reset_usec` is zero if it cannot or does not know the time of
 system reset, due to implementation or platform restrictions. `reset_usec` will usually be 0 or a
 value near zero, but may be any value relative to any point in the past.
+
+### MIPS64 CPU Features Feature
+
+ID:
+```c
+#define LIMINE_MIPS64_CPU_FEATURES_REQUEST { LIMINE_COMMON_MAGIC, 0x8c941a9b6b2f8a1e, 0x9e8b8c3c1b2a2e8b }
+```
+
+Request:
+```c
+struct limine_mips64_cpu_features_request {
+    uint64_t id[4];
+    uint64_t revision;
+    struct limine_mips64_cpu_features_response *response;
+};
+```
+
+Response:
+```c
+struct limine_mips64_cpu_features_response {
+    uint64_t revision;
+    uint64_t processor_id;
+    uint64_t mmu_size;
+    uint64_t tlb_entries;
+};
+```
+
+* `processor_id` - The processor ID of the CPU.
+* `mmu_size` - The size of the MMU.
+* `tlb_entries` - The number of TLB entries.
