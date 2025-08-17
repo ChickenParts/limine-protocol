@@ -344,6 +344,10 @@ LIMINE_DEPRECATED_IGNORE_END
 #define LIMINE_PAGING_MODE_ALPHA_3LVL 0
 #define LIMINE_PAGING_MODE_MIN LIMINE_PAGING_MODE_ALPHA_3LVL
 #define LIMINE_PAGING_MODE_DEFAULT LIMINE_PAGING_MODE_ALPHA_3LVL
+#elif defined (__hppa__)
+#define LIMINE_PAGING_MODE_PARISC_3LVL 0
+#define LIMINE_PAGING_MODE_MIN LIMINE_PAGING_MODE_PARISC_3LVL
+#define LIMINE_PAGING_MODE_DEFAULT LIMINE_PAGING_MODE_PARISC_3LVL
 #else
 #error Unknown architecture
 #endif
@@ -564,6 +568,23 @@ struct LIMINE_MP(response) {
     uint64_t revision;
     uint64_t flags;
     uint32_t bsp_id;
+    uint64_t cpu_count;
+    LIMINE_PTR(struct LIMINE_MP(info) **) cpus;
+};
+
+#elif defined (__hppa__)
+
+struct LIMINE_MP(info) {
+    uint32_t cpuid;
+    uint32_t reserved;
+    LIMINE_PTR(limine_goto_address) goto_address;
+    uint64_t extra_argument;
+};
+
+struct LIMINE_MP(response) {
+    uint64_t revision;
+    uint64_t flags;
+    uint32_t bsp_cpuid;
     uint64_t cpu_count;
     LIMINE_PTR(struct LIMINE_MP(info) **) cpus;
 };
