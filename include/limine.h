@@ -332,6 +332,10 @@ LIMINE_DEPRECATED_IGNORE_END
 #define LIMINE_PAGING_MODE_SPARC_V9_4LVL 0
 #define LIMINE_PAGING_MODE_MIN LIMINE_PAGING_MODE_SPARC_V9_4LVL
 #define LIMINE_PAGING_MODE_DEFAULT LIMINE_PAGING_MODE_SPARC_V9_4LVL
+#elif defined (__zarch__)
+#define LIMINE_PAGING_MODE_ZARCH_4LVL 0
+#define LIMINE_PAGING_MODE_MIN LIMINE_PAGING_MODE_ZARCH_4LVL
+#define LIMINE_PAGING_MODE_DEFAULT LIMINE_PAGING_MODE_ZARCH_4LVL
 #else
 #error Unknown architecture
 #endif
@@ -501,6 +505,23 @@ struct LIMINE_MP(response) {
     uint64_t revision;
     uint64_t flags;
     uint64_t bsp_tpc;
+    uint64_t cpu_count;
+    LIMINE_PTR(struct LIMINE_MP(info) **) cpus;
+};
+
+#elif defined (__zarch__)
+
+struct LIMINE_MP(info) {
+    uint16_t cpu_address;
+    uint16_t reserved;
+    LIMINE_PTR(limine_goto_address) goto_address;
+    uint64_t extra_argument;
+};
+
+struct LIMINE_MP(response) {
+    uint64_t revision;
+    uint64_t flags;
+    uint16_t bsp_cpu_address;
     uint64_t cpu_count;
     LIMINE_PTR(struct LIMINE_MP(info) **) cpus;
 };
