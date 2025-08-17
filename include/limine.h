@@ -1003,6 +1003,29 @@ struct limine_parisc_cpu_features_request {
     LIMINE_PTR(struct limine_parisc_cpu_features_response *) response;
 };
 
+/* Firmware Entry Point */
+
+#define LIMINE_FIRMWARE_ENTRY_POINT_REQUEST { LIMINE_COMMON_MAGIC, 0xf32f8d9b4c3e2a1b, 0x1a2b3c4d5e6f7890 }
+
+#define LIMINE_FIRMWARE_TYPE_OPEN_FIRMWARE 0
+#define LIMINE_FIRMWARE_TYPE_ARC 1
+#define LIMINE_FIRMWARE_TYPE_PA_RISC 2
+#define LIMINE_FIRMWARE_TYPE_ZARCH 3
+#define LIMINE_FIRMWARE_TYPE_ITANIUM 4
+#define LIMINE_FIRMWARE_TYPE_ALPHA 5
+
+struct limine_firmware_entry_point_response {
+    uint64_t revision;
+    uint64_t entry_point;
+    uint64_t type;
+};
+
+struct limine_firmware_entry_point_request {
+    uint64_t id[4];
+    uint64_t revision;
+    LIMINE_PTR(struct limine_firmware_entry_point_response *) response;
+};
+
 /* Bootloader Performance */
 
 #define LIMINE_BOOTLOADER_PERFORMANCE_REQUEST { LIMINE_COMMON_MAGIC, 0x6b50ad9bf36d13ad, 0xdc4c7e88fc759e17 }

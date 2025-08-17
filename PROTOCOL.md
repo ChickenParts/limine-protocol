@@ -2025,3 +2025,38 @@ struct limine_parisc_cpu_features_response {
 ```
 
 * `features` - The feature bits of the CPU.
+
+### Firmware Entry Point Feature
+
+ID:
+```c
+#define LIMINE_FIRMWARE_ENTRY_POINT_REQUEST { LIMINE_COMMON_MAGIC, 0xf32f8d9b4c3e2a1b, 0x1a2b3c4d5e6f7890 }
+```
+
+Request:
+```c
+struct limine_firmware_entry_point_request {
+    uint64_t id[4];
+    uint64_t revision;
+    struct limine_firmware_entry_point_response *response;
+};
+```
+
+Response:
+```c
+#define LIMINE_FIRMWARE_TYPE_OPEN_FIRMWARE 0
+#define LIMINE_FIRMWARE_TYPE_ARC 1
+#define LIMINE_FIRMWARE_TYPE_PA_RISC 2
+#define LIMINE_FIRMWARE_TYPE_ZARCH 3
+#define LIMINE_FIRMWARE_TYPE_ITANIUM 4
+#define LIMINE_FIRMWARE_TYPE_ALPHA 5
+
+struct limine_firmware_entry_point_response {
+    uint64_t revision;
+    uint64_t entry_point;
+    uint64_t type;
+};
+```
+
+* `entry_point` - The address of the firmware entry point.
+* `type` - The type of firmware.
